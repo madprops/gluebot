@@ -114,7 +114,7 @@ async def on_message(ws, message):
 			update_time()
 			await gif_numbers(None, room_id)
 
-		elif cmd == "date":
+		elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
 			update_time()
 			await gif_date(None, room_id)
 
