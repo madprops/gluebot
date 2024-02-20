@@ -34,11 +34,6 @@ Set the path to `gifmaker` and maybe change the `prefix`.
 
 By default it points to `/usr/bin/gifmaker`.
 
-```sh
-#!/usr/bin/env bash
-/path/to/gifmaker/venv/bin/python /path/to/gifmaker/src/main.py
-```
-
 ---
 
 ## Files
