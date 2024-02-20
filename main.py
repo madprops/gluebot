@@ -1,4 +1,4 @@
-import requests, websockets, asyncio, json, re, traceback, subprocess, os
+import requests, websockets, asyncio, json, re, traceback, subprocess, os, aiohttp
 from datetime import datetime
 from pathlib import Path
 
@@ -13,6 +13,13 @@ if not username or not password:
 def get_time():
 	return datetime.now().timestamp()
 
+def remove_file(path):
+	try:
+		path.unlink()
+	except Exception as e:
+		print(f"(Remove) Error: {e}")
+		traceback.print_exc()
+
 def get_extension(path):
 	return Path(path).suffix.lower().lstrip(".")
 
@@ -22,7 +29,6 @@ headers = {
 	"DNT": "1",
 }
 
-cmd_date = get_time()
 url = "https://deek.chat"
 ws_url = "wss://deek.chat/ws"
 prefix = ","
@@ -32,6 +38,8 @@ delay = 5
 
 gifmaker = "/usr/bin/gifmaker"
 gm_common = "--font triplex --width 555 --nogrow --output /tmp/gifmaker"
+
+cmd_date = get_time()
 
 def update_time():
 	global cmd_date
@@ -177,7 +185,7 @@ async def run_command(command, room_id):
 	await upload(Path(stdout.decode().strip()), room_id)
 
 async def upload(path, room_id):
-	if not path.exists() or path.is_dir():
+	if (not path.exists()) or (not path.is_file()):
 		return
 
 	cookies = {
@@ -186,26 +194,20 @@ async def upload(path, room_id):
 	}
 
 	ext = get_extension(path)
-
-	files = {
-		"text": (None, ""),
-		"files[]": (path.name, open(path, "rb").read(), f"image/{ext}"),
-	}
-
-	def remove_file():
-		try:
-			path.unlink()
-		except Exception as e:
-			print(f"(Remove) Error: {e}")
-			traceback.print_exc()
+	url = "https://deek.chat/message/send/" + str(room_id)
+	data = aiohttp.FormData()
+	data.add_field(name="files[]", value=open(path, "rb"), \
+	filename=path.name, content_type=f"image/{ext}")
 
 	try:
-		requests.post("https://deek.chat/message/send/" + str(room_id), cookies=cookies, headers={}, files=files)
-		remove_file()
+		async with aiohttp.ClientSession(cookies=cookies) as sess:
+			async with sess.post(url, data=data, headers={}) as response:
+				await response.text()
 	except Exception as e:
-		remove_file()
 		print(f"(Upload) Error: {e}")
 		traceback.print_exc()
+
+	remove_file(path)
 
 async def send_message(ws, text, room_id):
 	await ws.send(json.dumps({"type": "message", "data": text, "roomId": room_id}))
