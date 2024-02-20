@@ -132,7 +132,7 @@ async def gif_describe(who, room_id):
 		"--top 0 --fontsize 2.3 --filter random2",
 	]
 
-	await run_command(command, room_id)
+	await run_gifmaker(command, room_id)
 
 async def gif_wins(who, room_id):
 	input_path = get_input_path("wins.gif")
@@ -145,7 +145,7 @@ async def gif_wins(who, room_id):
 		"--bottom 0 --fontsize 1.4 --boldness 2 --filter anyhue2 --framelist 11,11,33,33",
 	]
 
-	await run_command(command, room_id)
+	await run_gifmaker(command, room_id)
 
 async def gif_numbers(who, room_id):
 	input_path = get_input_path("numbers.png")
@@ -157,7 +157,7 @@ async def gif_numbers(who, room_id):
 		"--top 0 --words '[number 1-3] [x3]' --fontcolor 0,0,0",
 	]
 
-	await run_command(command, room_id)
+	await run_gifmaker(command, room_id)
 
 async def gif_date(who, room_id):
 	input_path = get_input_path("time.jpg")
@@ -170,9 +170,9 @@ async def gif_date(who, room_id):
 		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0",
 	]
 
-	await run_command(command, room_id)
+	await run_gifmaker(command, room_id)
 
-async def run_command(command, room_id):
+async def run_gifmaker(command, room_id):
 	process = await asyncio.create_subprocess_shell(
 		" ".join(command),
 		stdout=subprocess.PIPE,
