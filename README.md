@@ -38,7 +38,7 @@ By default it points to `/usr/bin/gifmaker`.
 
 ## Files
 
-Files generated through commands are stored in `/tmp/gifmaker` and removed when uploaded.
+Files generated through commands are stored in `/tmp/gifmaker` and removed after they're done uploading.
 
 ---
 
