@@ -1,4 +1,4 @@
-<img src="numbers.png" width="360">
+<img src="describe.jpg" width="360">
 
 ---
 
