@@ -2,6 +2,7 @@ import requests, websockets, asyncio, json, re, traceback, subprocess, os
 from datetime import datetime
 from pathlib import Path
 
+HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
 password = os.environ.get("GLUEBOT_PASSWORD")
 
@@ -29,7 +30,7 @@ token = None
 session = None
 delay = 5
 
-gifmaker = "gifmaker"
+gifmaker = "/usr/bin/gifmaker"
 gm_common = "--font triplex --width 555 --nogrow --output /tmp/gifmaker"
 
 def update_time():
@@ -54,7 +55,7 @@ async def run():
 				message = await ws.recv()
 				await on_message(ws, message)
 		except KeyboardInterrupt:
-			return
+			exit(0)
 		except websockets.exceptions.ConnectionClosedOK:
 			print("WebSocket connection closed")
 		except Exception as e:
@@ -105,11 +106,16 @@ async def on_message(ws, message):
 			update_time()
 			await gif_date(None, room_id)
 
+def get_input_path(name):
+	return str(Path(HERE, name))
+
 async def gif_describe(who, room_id):
+	input_path = get_input_path("describe.jpg")
+
 	command = [
 		gifmaker,
 		gm_common,
-		"--input 'describe.jpg'",
+		f"--input '{input_path}'",
 		f"--words '{who} is [Random] [x5]' --bgcolor 0,0,0",
 		"--top 0 --fontsize 2.3 --filter random2",
 	]
@@ -117,10 +123,12 @@ async def gif_describe(who, room_id):
 	await run_command(command, room_id)
 
 async def gif_wins(who, room_id):
+	input_path = get_input_path("wins.gif")
+
 	command = [
 		gifmaker,
 		gm_common,
-		"--input 'wins.gif'",
+		f"--input '{input_path}'",
 		f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0 --boldness 2",
 		"--bottom 0 --fontsize 1.4 --boldness 2 --filter anyhue2 --framelist 11,11,33,33",
 	]
@@ -128,20 +136,24 @@ async def gif_wins(who, room_id):
 	await run_command(command, room_id)
 
 async def gif_numbers(who, room_id):
+	input_path = get_input_path("numbers.png")
+
 	command = [
 		gifmaker,
 		gm_common,
-		"--input 'numbers.png'",
+		f"--input '{input_path}'",
 		"--top 0 --words '[number 1-3] [x3]' --fontcolor 0,0,0",
 	]
 
 	await run_command(command, room_id)
 
 async def gif_date(who, room_id):
+	input_path = get_input_path("time.jpg")
+
 	command = [
 		gifmaker,
 		gm_common,
-		"--input 'time.jpg'",
+		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
 		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0",
 	]

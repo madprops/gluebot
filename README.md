@@ -32,10 +32,11 @@ Modify `main.py` itself to edit what you need.
 
 Set the path to `gifmaker` and maybe change the `prefix`.
 
-You could make an alias for gifmaker:
+By default it points to `/usr/bin/gifmaker`.
 
-```shell
-alias gifmaker="/path/to/venv/bin/python /path/to/gifmaker/src/main.py"
+```sh
+#!/usr/bin/env bash
+/path/to/gifmaker/venv/bin/python /path/to/gifmaker/src/main.py
 ```
 
 ---
