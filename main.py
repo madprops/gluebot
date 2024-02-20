@@ -96,17 +96,21 @@ async def on_message(ws, message):
 			update_time()
 			await send_message(ws, "Pong!", room_id)
 
+		elif cmd == "help":
+			update_time()
+			await send_message(ws, f"Commands: describe | wins | numbers | date", room_id)
+
 		elif cmd == "describe":
 			if len(args) >= 1:
 				update_time()
 				await gif_describe(args[0], room_id)
 
-		elif cmd == "wins":
+		elif cmd == "wins" or cmd == "win":
 			if len(args) >= 1:
 				update_time()
 				await gif_wins(args[0], room_id)
 
-		elif cmd == "numbers":
+		elif cmd == "numbers" or cmd == "number" or cmd == "num":
 			update_time()
 			await gif_numbers(None, room_id)
 
