@@ -1,14 +1,10 @@
-import requests, websockets, asyncio, json, re, traceback, subprocess, os, aiohttp
+import requests, websockets, asyncio, json, re, traceback, subprocess, os, aiohttp, sys
 from datetime import datetime
 from pathlib import Path
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
 password = os.environ.get("GLUEBOT_PASSWORD")
-
-if not username or not password:
-	print("Missing environment variables")
-	exit(1)
 
 def get_time():
 	return datetime.now().timestamp()
@@ -37,7 +33,7 @@ session = None
 delay = 3
 
 gifmaker = "/usr/bin/gifmaker"
-gm_common = "--font triplex --width 350 --nogrow --output /tmp/gifmaker"
+gm_common = "--width 350 --nogrow --output /tmp/gifmaker"
 
 cmd_date = get_time()
 
@@ -50,6 +46,11 @@ def blocked():
 
 def auth():
 	global token, session, headers
+
+	if not username or not password:
+		print("Missing environment variables")
+		exit(1)
+
 	data = {"name": username, "password": password, "submit": "log+in"}
 	res = requests.post(url + "/login/submit", headers=headers, data=data, allow_redirects=False)
 	token = re.search("(?:api_token)=[^;]+", res.headers.get("Set-Cookie")).group(0)
@@ -129,8 +130,8 @@ async def gif_describe(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		f"--words '{who} is\\n[Random] [x5]'",
-		"--filter anyhue2 --top -56 --linespace 50 --opacity 1",
-		"--fontsize 2.2 --padding 50 --fontcolor light2 --bgcolor dark2",
+		"--filter anyhue2 --top -56 --opacity 1 --fontsize 66 --delay 700",
+		"--padding 50 --fontcolor light2 --bgcolor dark2",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -142,8 +143,8 @@ async def gif_wins(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0 --boldness 2",
-		"--bottom 0 --fontsize 1.4 --boldness 2 --filter anyhue2 --framelist 11,11,33,33",
+		f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0",
+		"--bottom 0 --filter anyhue2 --framelist 11,11,33,33",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -155,7 +156,7 @@ async def gif_numbers(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--top 0 --words '[number 0-999] [x3]' --fontcolor 0,0,0",
+		"--top 0 --words '[number 0-999] [x3]' --fontcolor 0,0,0 --fontsize 70",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -168,7 +169,7 @@ async def gif_date(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
-		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0 --fontsize 2.6",
+		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0 --fontsize 80",
 	]
 
 	await run_gifmaker(command, room_id)
