@@ -129,7 +129,8 @@ async def gif_describe(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		f"--words '{who} is\\n[Random] [x5]' --bgcolor 0,0,0",
-		"--top 0 --fontsize 2.3 --filter anyhue2 --top -40",
+		"--top 0 --filter anyhue2 --top -56 --linespace 50",
+		"--fontsize 2.2 --padding 50",
 	]
 
 	await run_gifmaker(command, room_id)
