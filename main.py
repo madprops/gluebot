@@ -110,7 +110,7 @@ async def on_message(ws, message):
 				update_time()
 				await gif_wins(args[0], room_id)
 
-		elif cmd == "numbers" or cmd == "number" or cmd == "num":
+		elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
 			update_time()
 			await gif_numbers(None, room_id)
 
@@ -154,7 +154,7 @@ async def gif_numbers(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--top 0 --words '[number 1-3] [x3]' --fontcolor 0,0,0",
+		"--top 0 --words '[number 0,999] [x3]' --fontcolor 0,0,0",
 	]
 
 	await run_gifmaker(command, room_id)
