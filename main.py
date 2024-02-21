@@ -187,6 +187,7 @@ async def gif_bird(who, room_id):
 		f"--input '{input_path}'",
 		"--words '[randomx]' --randomfile data/aves.txt --bgcolor 0,0,0",
 		"--filter anyhue2 --frames 3 --fontsize 42 --fillwords",
+		"--fontcolor light2 --bgcolor dark2 --outline font",
 	]
 
 	await run_gifmaker(command, room_id)
