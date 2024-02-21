@@ -154,7 +154,8 @@ async def gif_numbers(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--top 0 --words '[number 0,999] [x3]' --fontcolor 0,0,0",
+		"--fontsize 2.6",
+		"--top 0 --words '[number 0-999] [x3]' --fontcolor 0,0,0",
 	]
 
 	await run_gifmaker(command, room_id)
