@@ -1,4 +1,4 @@
-<img src="describe.jpg" width="360">
+<img src="bot.jpg" width="360">
 
 ---
 

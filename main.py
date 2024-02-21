@@ -37,7 +37,7 @@ session = None
 delay = 5
 
 gifmaker = "/usr/bin/gifmaker"
-gm_common = "--font triplex --width 555 --nogrow --output /tmp/gifmaker"
+gm_common = "--font triplex --width 350 --nogrow --output /tmp/gifmaker"
 
 cmd_date = get_time()
 
@@ -128,8 +128,8 @@ async def gif_describe(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		f"--words '{who} is [Random] [x5]' --bgcolor 0,0,0",
-		"--top 0 --fontsize 2.3 --filter random2",
+		f"--words '{who}\\nis [Random] [x5]' --bgcolor 0,0,0",
+		"--top 0 --fontsize 2.3 --filter random2 --top -40",
 	]
 
 	await run_gifmaker(command, room_id)
