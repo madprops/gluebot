@@ -154,7 +154,6 @@ async def gif_numbers(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--fontsize 2.6",
 		"--top 0 --words '[number 0-999] [x3]' --fontcolor 0,0,0",
 	]
 
@@ -168,7 +167,7 @@ async def gif_date(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
-		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0",
+		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0 --fontsize 2.6",
 	]
 
 	await run_gifmaker(command, room_id)
