@@ -148,7 +148,7 @@ async def gif_wins(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0",
-		"--bottom 0 --filter anyhue2 --framelist 11,11,33,33 --fontsize=42",
+		"--bottom 20 --filter anyhue2 --framelist 11,11,33,33 --fontsize=42",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -160,7 +160,7 @@ async def gif_numbers(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--top 0 --words '[number 0-999] [x3]' --fontcolor 0,0,0 --fontsize 66",
+		"--top 20 --words '[number 0-999] [x3]' --fontcolor 0,0,0 --fontsize 66",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -173,7 +173,7 @@ async def gif_date(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
-		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0 --fontsize 80",
+		"--filter anyhue2 --bottom 20 --bgcolor 0,0,0 --fontsize 80",
 	]
 
 	await run_gifmaker(command, room_id)
