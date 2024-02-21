@@ -144,7 +144,7 @@ async def gif_wins(who, room_id):
 		gm_common,
 		f"--input '{input_path}'",
 		f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0",
-		"--bottom 0 --filter anyhue2 --framelist 11,11,33,33",
+		"--bottom 0 --filter anyhue2 --framelist 11,11,33,33 --fontsize=42",
 	]
 
 	await run_gifmaker(command, room_id)
