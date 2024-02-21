@@ -34,7 +34,7 @@ ws_url = "wss://deek.chat/ws"
 prefix = ","
 token = None
 session = None
-delay = 5
+delay = 3
 
 gifmaker = "/usr/bin/gifmaker"
 gm_common = "--font triplex --width 350 --nogrow --output /tmp/gifmaker"
@@ -128,8 +128,8 @@ async def gif_describe(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		f"--words '{who} is\\n[Random] [x5]' --bgcolor 0,0,0",
-		"--top 0 --filter anyhue2 --top -56 --linespace 50 --opacity 1",
+		f"--words '{who} is\\n[Random] [x5]'",
+		"--filter anyhue2 --top -56 --linespace 50 --opacity 1",
 		"--fontsize 2.2 --padding 50 --fontcolor light2 --bgcolor dark2",
 	]
 
