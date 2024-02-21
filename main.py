@@ -99,7 +99,7 @@ async def on_message(ws, message):
 
 		elif cmd == "help":
 			update_time()
-			await send_message(ws, f"Commands: describe | wins | numbers | date", room_id)
+			await send_message(ws, f"Commands: describe | wins | numbers | date | bird", room_id)
 
 		elif cmd == "describe":
 			if len(args) >= 1:
@@ -118,6 +118,10 @@ async def on_message(ws, message):
 		elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
 			update_time()
 			await gif_date(None, room_id)
+
+		elif cmd == "bird" or cmd == "birds" or cmd == "birb" or cmd == "birbs" or cmd == "brb":
+			update_time()
+			await gif_bird(None, room_id)
 
 def get_input_path(name):
 	return str(Path(HERE, name))
@@ -170,6 +174,19 @@ async def gif_date(who, room_id):
 		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
 		"--filter anyhue2 --bottom 0 --bgcolor 0,0,0 --fontsize 80",
+	]
+
+	await run_gifmaker(command, room_id)
+
+async def gif_bird(who, room_id):
+	input_path = get_input_path("bird.png")
+
+	command = [
+		gifmaker,
+		gm_common,
+		f"--input '{input_path}'",
+		"--words '[randomx]' --randomfile data/aves.txt --bgcolor 0,0,0",
+		"--filter anyhue2 --frames 3 --fontsize 42 --fillwords",
 	]
 
 	await run_gifmaker(command, room_id)
