@@ -128,7 +128,7 @@ async def gif_describe(who, room_id):
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		f"--words '{who}\\nis [Random] [x5]' --bgcolor 0,0,0",
+		f"--words '{who} is\\n[Random] [x5]' --bgcolor 0,0,0",
 		"--top 0 --fontsize 2.3 --filter random2 --top -40",
 	]
 
