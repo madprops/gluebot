@@ -227,9 +227,7 @@ async def random_post(ws, room_id):
 		# Select a random post
 		post = posts[random_int(0, len(posts) - 1)]
 		html = post.get("com", "")
-
-		if not html:
-			return
+		if not html: return
 
 		# Parse HTML using BeautifulSoup
 		soup = BeautifulSoup(html, "html.parser")
@@ -244,10 +242,6 @@ async def random_post(ws, room_id):
 
 		# Get text content and limit to 500 characters
 		text = soup.get_text(separator="\n")[:500].strip()
-
-		if not text:
-				return
-
 		text = clean_lines(text)
 
 		if text:
