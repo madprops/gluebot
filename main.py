@@ -34,6 +34,21 @@ def random_int(min_val, max_val):
 def get_path(name):
 	return str(Path(HERE, name))
 
+def extract_range(string):
+	pattern = re.compile(r"(\d+)(?:-(\d+))?")
+	match = pattern.search(string)
+
+	if not match:
+		return [0]
+
+	start = match.group(1)
+	end = match.group(2)
+
+	if end is None:
+		return [int(start)]
+	else:
+		return [int(start), int(end)]
+
 headers = {
 	"User-Agent": "gluebot",
 	"Origin": "https://deek.chat",
@@ -128,7 +143,7 @@ async def on_message(ws, message):
 
 		elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
 			update_time()
-			await gif_numbers(None, room_id)
+			await gif_numbers(args[0], room_id)
 
 		elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
 			update_time()
@@ -177,14 +192,27 @@ async def gif_wins(who, room_id):
 
 	await run_gifmaker(command, room_id)
 
-async def gif_numbers(who, room_id):
+async def gif_numbers(arg, room_id):
 	input_path = get_path("numbers.png")
+	numbers = extract_range(arg)
+	num = -1
+
+	if len(numbers) == 1:
+		if numbers[0] > 0:
+			num = random_int(0, numbers[0])
+	elif len(numbers) == 2:
+		if numbers[0] < numbers[1]:
+			num = random_int(numbers[0], numbers[1])
+
+	if num == -1:
+		num = random_int(0, 999)
 
 	command = [
 		gifmaker,
 		gm_common,
 		f"--input '{input_path}'",
-		"--top 20 --words '[number 0-999] [x3]' --fontcolor 0,0,0 --fontsize 66",
+		f"--top 20 --words '{num}' --fontcolor 0,0,0",
+		"--fontsize 66 --format jpg",
 	]
 
 	await run_gifmaker(command, room_id)
@@ -276,6 +304,10 @@ async def upload(path, room_id):
 	}
 
 	ext = get_extension(path)
+
+	if ext == "jpg":
+		ext = "jpeg"
+
 	url = "https://deek.chat/message/send/" + str(room_id)
 	data = aiohttp.FormData()
 	data.add_field(name="files[]", value=open(path, "rb"), \
