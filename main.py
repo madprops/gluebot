@@ -52,6 +52,12 @@ def extract_range(string):
 def clean_list(lst):
 	return list(filter(lambda x: x != "", lst))
 
+def string_to_number(input_string):
+	hash_value = hash(input_string)
+	absolute_hash = abs(hash_value)
+	scaled_number = absolute_hash % 1000
+	return scaled_number
+
 headers = {
 	"User-Agent": "gluebot",
 	"Origin": "https://deek.chat",
@@ -212,6 +218,9 @@ async def gif_numbers(arg, room_id):
 		elif len(numbers) == 2:
 			if numbers[0] < numbers[1]:
 				num = random_int(numbers[0], numbers[1])
+
+		if num == -1:
+			num = string_to_number(arg)
 
 	if num < 0:
 		num = random_int(0, 999)
