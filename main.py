@@ -142,8 +142,13 @@ async def on_message(ws, message):
 				await gif_wins(args[0], room_id)
 
 		elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
+			if len(args) >= 1:
+				arg = args[0]
+			else:
+				arg = None
+
 			update_time()
-			await gif_numbers(args[0], room_id)
+			await gif_numbers(arg, room_id)
 
 		elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
 			update_time()
@@ -193,19 +198,22 @@ async def gif_wins(who, room_id):
 	await run_gifmaker(command, room_id)
 
 async def gif_numbers(arg, room_id):
-	input_path = get_path("numbers.png")
-	numbers = extract_range(arg)
 	num = -1
 
-	if len(numbers) == 1:
-		if numbers[0] > 0:
-			num = random_int(0, numbers[0])
-	elif len(numbers) == 2:
-		if numbers[0] < numbers[1]:
-			num = random_int(numbers[0], numbers[1])
+	if arg:
+		numbers = extract_range(arg)
 
-	if num == -1:
+		if len(numbers) == 1:
+			if numbers[0] > 0:
+				num = random_int(0, numbers[0])
+		elif len(numbers) == 2:
+			if numbers[0] < numbers[1]:
+				num = random_int(numbers[0], numbers[1])
+
+	if num <= 0:
 		num = random_int(0, 999)
+
+	input_path = get_path("numbers.png")
 
 	command = [
 		gifmaker,
