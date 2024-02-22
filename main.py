@@ -208,9 +208,11 @@ async def gif_bird(who, room_id):
 	await run_gifmaker(command, room_id)
 
 async def random_post(ws, room_id):
-	threads_url = "https://a.4cdn.org/g/threads.json"
+	boards = ["g", "an", "ck", "lit", "x", "tv", "v", "fit", "k", "o"]
+	board = random.choice(boards)
 
 	try:
+		threads_url = f"https://a.4cdn.org/{board}/threads.json"
 		async_client = httpx.AsyncClient()
 		threads_response = await async_client.get(threads_url)
 		threads_response.raise_for_status()
@@ -219,7 +221,7 @@ async def random_post(ws, room_id):
 
 		# Select a random thread
 		id = threads[random_int(0, len(threads) - 1)]["no"]
-		thread_url = f"https://a.4cdn.org/g/thread/{id}.json"
+		thread_url = f"https://a.4cdn.org/{board}/thread/{id}.json"
 
 		# Fetch the selected thread
 		thread_response = await async_client.get(thread_url)
