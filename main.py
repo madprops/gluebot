@@ -110,7 +110,7 @@ async def on_message(ws, message):
 
 		elif cmd == "help":
 			update_time()
-			await send_message(ws, f"Commands: describe | wins | numbers | date | bird", room_id)
+			await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost", room_id)
 
 		elif cmd == "describe":
 			if len(args) >= 1:
