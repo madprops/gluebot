@@ -222,7 +222,7 @@ async def gif_numbers(arg, room_id):
 		if num == -1:
 			num = string_to_number(arg)
 
-	if num < 0:
+	if num == -1:
 		num = random_int(0, 999)
 
 	input_path = get_path("numbers.png")
