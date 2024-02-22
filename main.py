@@ -148,7 +148,7 @@ async def random_bird(ws, room_id):
 	async with aiofiles.open(birdfile, mode="r", encoding="utf-8") as file:
 		birds = await file.readlines()
 		bird = random.choice(birds).strip()
-		await send_message(ws, f".i {bird} bird", room_id)
+		await send_message(ws, f".i \"{bird}\" bird", room_id)
 
 async def gif_describe(who, room_id):
 	input_path = get_path("describe.jpg")
