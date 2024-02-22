@@ -35,7 +35,7 @@ def get_path(name):
 	return str(Path(HERE, name))
 
 def extract_range(string):
-	pattern = re.compile(r"(\d+)(?:-(\d+))?")
+	pattern = re.compile(r"\s*(\d+)\s*(?:-\s*(\d+))?\s*")
 	match = pattern.search(string)
 
 	if not match:
@@ -48,6 +48,9 @@ def extract_range(string):
 		return [int(start)]
 	else:
 		return [int(start), int(end)]
+
+def clean_list(lst):
+	return list(filter(lambda x: x != "", lst))
 
 headers = {
 	"User-Agent": "gluebot",
@@ -142,8 +145,8 @@ async def on_message(ws, message):
 				await gif_wins(args[0], room_id)
 
 		elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
-			if len(args) >= 1:
-				arg = args[0]
+			if len(args) > 0:
+				arg = " ".join(clean_list(args))
 			else:
 				arg = None
 
@@ -210,7 +213,7 @@ async def gif_numbers(arg, room_id):
 			if numbers[0] < numbers[1]:
 				num = random_int(numbers[0], numbers[1])
 
-	if num <= 0:
+	if num < 0:
 		num = random_int(0, 999)
 
 	input_path = get_path("numbers.png")
