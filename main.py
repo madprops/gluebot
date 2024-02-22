@@ -3,6 +3,7 @@ import traceback, subprocess, os, aiohttp, sys, random
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
+import aiofiles
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
@@ -29,6 +30,9 @@ def clean_lines(s):
 
 def random_int(min_val, max_val):
 	return random.randint(min_val, max_val)
+
+def get_path(name):
+	return str(Path(HERE, name))
 
 headers = {
 	"User-Agent": "gluebot",
@@ -132,17 +136,22 @@ async def on_message(ws, message):
 
 		elif cmd == "bird" or cmd == "birds" or cmd == "birb" or cmd == "birbs" or cmd == "brb":
 			update_time()
-			await gif_bird(None, room_id)
+			await random_bird(ws, room_id)
 
 		elif cmd == "post" or cmd == "shitpost" or cmd == "4chan" or cmd == "anon" or cmd == "shit":
 			update_time()
 			await random_post(ws, room_id)
 
-def get_input_path(name):
-	return str(Path(HERE, name))
+async def random_bird(ws, room_id):
+	birdfile = get_path("data/aves.txt")
+
+	async with aiofiles.open(birdfile, mode="r", encoding="utf-8") as file:
+		birds = await file.readlines()
+		bird = random.choice(birds).strip()
+		await send_message(ws, f".i {bird} bird", room_id)
 
 async def gif_describe(who, room_id):
-	input_path = get_input_path("describe.jpg")
+	input_path = get_path("describe.jpg")
 
 	command = [
 		gifmaker,
@@ -156,7 +165,7 @@ async def gif_describe(who, room_id):
 	await run_gifmaker(command, room_id)
 
 async def gif_wins(who, room_id):
-	input_path = get_input_path("wins.gif")
+	input_path = get_path("wins.gif")
 
 	command = [
 		gifmaker,
@@ -169,7 +178,7 @@ async def gif_wins(who, room_id):
 	await run_gifmaker(command, room_id)
 
 async def gif_numbers(who, room_id):
-	input_path = get_input_path("numbers.png")
+	input_path = get_path("numbers.png")
 
 	command = [
 		gifmaker,
@@ -181,7 +190,7 @@ async def gif_numbers(who, room_id):
 	await run_gifmaker(command, room_id)
 
 async def gif_date(who, room_id):
-	input_path = get_input_path("time.jpg")
+	input_path = get_path("time.jpg")
 
 	command = [
 		gifmaker,
@@ -189,20 +198,6 @@ async def gif_date(who, room_id):
 		f"--input '{input_path}'",
 		"--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
 		"--filter anyhue2 --bottom 20 --bgcolor 0,0,0 --fontsize 80",
-	]
-
-	await run_gifmaker(command, room_id)
-
-async def gif_bird(who, room_id):
-	input_path = get_input_path("bird.png")
-
-	command = [
-		gifmaker,
-		gm_common,
-		f"--input '{input_path}'",
-		"--words '[randomx]' --randomfile data/aves.txt --bgcolor 0,0,0",
-		"--filter anyhue2 --frames 3 --fontsize 42 --fillwords",
-		"--fontcolor light --bgcolor dark --outline font --opacity 0.9",
 	]
 
 	await run_gifmaker(command, room_id)
