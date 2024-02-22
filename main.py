@@ -1,4 +1,6 @@
-import requests, websockets, asyncio, json, re, traceback, subprocess, os, aiohttp, sys
+import requests, websockets, asyncio, json, re, httpx
+import traceback, subprocess, os, aiohttp, sys, random
+from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 
@@ -19,8 +21,17 @@ def remove_file(path):
 def get_extension(path):
 	return Path(path).suffix.lower().lstrip(".")
 
+def clean_lines(s):
+	cleaned = s
+	cleaned = re.sub(r" *(\n+|\\n+) *", "\n", cleaned)
+	cleaned = re.sub(r" +", " ", cleaned)
+	return cleaned.strip()
+
+def random_int(min_val, max_val):
+	return random.randint(min_val, max_val)
+
 headers = {
-	"User-Agent": "renabot",
+	"User-Agent": "gluebot",
 	"Origin": "https://deek.chat",
 	"DNT": "1",
 }
@@ -123,6 +134,10 @@ async def on_message(ws, message):
 			update_time()
 			await gif_bird(None, room_id)
 
+		elif cmd == "post" or cmd == "shitpost" or cmd == "4chan" or cmd == "anon" or cmd == "shit":
+			update_time()
+			await random_post(ws, room_id)
+
 def get_input_path(name):
 	return str(Path(HERE, name))
 
@@ -191,6 +206,58 @@ async def gif_bird(who, room_id):
 	]
 
 	await run_gifmaker(command, room_id)
+
+async def random_post(ws, room_id):
+	threads_url = "https://a.4cdn.org/g/threads.json"
+
+	try:
+		async_client = httpx.AsyncClient()
+		threads_response = await async_client.get(threads_url)
+		threads_response.raise_for_status()
+		threads_json = threads_response.json()
+		threads = threads_json[0]["threads"]
+
+		# Select a random thread
+		id = threads[random_int(0, len(threads) - 1)]["no"]
+		thread_url = f"https://a.4cdn.org/g/thread/{id}.json"
+
+		# Fetch the selected thread
+		thread_response = await async_client.get(thread_url)
+		thread_response.raise_for_status()
+		thread_json = thread_response.json()
+		posts = thread_json["posts"]
+
+		# Select a random post
+		post = posts[random_int(0, len(posts) - 1)]
+		html = post.get("com", "")
+
+		if not html:
+			return
+
+		# Parse HTML using BeautifulSoup
+		soup = BeautifulSoup(html, "html.parser")
+
+		# Remove elements with class "quotelink"
+		for elem in soup.select(".quotelink"):
+			elem.decompose()
+
+		# Replace <br> with newline
+		for br in soup.find_all("br"):
+			br.replace_with("\n")
+
+		# Get text content and limit to 500 characters
+		text = soup.get_text(separator="\n")[:500].strip()
+
+		if not text:
+				return
+
+		text = clean_lines(text)
+
+		if text:
+			await send_message(ws, text, room_id)
+
+	except Exception as err:
+		print(f"Error: {err}")
 
 async def run_gifmaker(command, room_id):
 	process = await asyncio.create_subprocess_shell(
