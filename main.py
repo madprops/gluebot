@@ -35,7 +35,7 @@ def get_path(name):
 	return str(Path(HERE, name))
 
 def extract_range(string):
-	pattern = re.compile(r"\s*(\d+)\s*(?:-\s*(\d+))?\s*")
+	pattern = re.compile(r"\s*(\d+)\s*(\d+)?\s*")
 	match = pattern.search(string)
 
 	if not match:
