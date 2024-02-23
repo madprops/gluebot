@@ -245,7 +245,10 @@ async def gif_numbers(arg, room_id):
 
         if nums[0] is not None:
             if nums[1] is not None:
-                num = random_int(nums[0], nums[1])
+                if nums[0] < nums[1]:
+                    num = random_int(nums[0], nums[1])
+                else:
+                    return
             else:
                 num = random_int(0, nums[0])
 
