@@ -170,20 +170,23 @@ async def on_message(ws, message):
         elif cmd == "describe":
             if len(args) >= 1:
                 update_time()
-                await gif_describe(args[0], room_id)
+                arg = " ".join(clean_list(args))
+                await gif_describe(arg, room_id)
 
         elif cmd == "wins" or cmd == "win":
             if len(args) >= 1:
                 update_time()
-                await gif_wins(args[0], room_id)
+                arg = " ".join(clean_list(args))
+                await gif_wins(arg, room_id)
 
         elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
+            update_time()
+
             if len(args) > 0:
                 arg = " ".join(clean_list(args))
             else:
                 arg = None
 
-            update_time()
             await gif_numbers(arg, room_id)
 
         elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
@@ -216,8 +219,8 @@ async def gif_describe(who, room_id):
         gm_common,
         f"--input '{input_path}'",
         f"--words '{who} is\\n[Random] [x5]'",
-        "--filter anyhue2 --opacity 1 --fontsize 66 --delay 700",
-        "--padding 50 --fontcolor light2 --bgcolor black",
+        "--filter anyhue2 --opacity 0.8 --fontsize 66 --delay 700",
+        "--padding 50 --fontcolor light2 --bgcolor black --font comic",
     ]
 
     await run_gifmaker(command, room_id)
