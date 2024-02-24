@@ -252,9 +252,12 @@ async def gif_numbers(arg, room_id):
             else:
                 num = random_int(0, nums[0])
 
-        if num == -1: num = string_to_number(arg)
+        if num == -1:
+            num = string_to_number(arg)
 
-    if num == -1: num = random_int(0, 999)
+    if num == -1:
+        num = random_int(0, 999)
+
     input_path = get_path("numbers.png")
 
     command = [
@@ -307,7 +310,9 @@ async def random_post(ws, room_id):
         # Select a random post
         post = posts[random_int(0, len(posts) - 1)]
         html = post.get("com", "")
-        if not html: return
+
+        if not html:
+            return
 
         # Parse HTML using BeautifulSoup
         soup = BeautifulSoup(html, "html.parser")
@@ -323,7 +328,9 @@ async def random_post(ws, room_id):
         # Get text content and limit to 500 characters
         text = soup.get_text(separator="\n")[:500].strip()
         text = clean_lines(text)
-        if not text: return
+
+        if not text:
+            return
 
         await send_message(ws, text, room_id)
 
