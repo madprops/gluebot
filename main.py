@@ -112,12 +112,9 @@ def auth():
         exit(1)
 
     data = {"name": username, "password": password, "submit": "log+in"}
-    res = requests.post(url + "/login/submit", headers=headers,
-                        data=data, allow_redirects=False)
-    token = re.search("(?:api_token)=[^;]+",
-                      res.headers.get("Set-Cookie")).group(0)
-    session = re.search(
-        "(?:session_id)=[^;]+", res.headers.get("Set-Cookie")).group(0)
+    res = requests.post(url + "/login/submit", headers=headers, data=data, allow_redirects=False)
+    token = re.search("(?:api_token)=[^;]+", res.headers.get("Set-Cookie")).group(0)
+    session = re.search("(?:session_id)=[^;]+", res.headers.get("Set-Cookie")).group(0)
     headers["Cookie"] = token + "; " + session
 
 
@@ -191,7 +188,7 @@ async def on_message(ws, message):
 
         elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
             update_time()
-            await gif_date(None, room_id)
+            await gif_date(room_id)
 
         elif cmd == "bird" or cmd == "birds" or cmd == "birb" or cmd == "birbs" or cmd == "brb":
             update_time()
@@ -255,12 +252,9 @@ async def gif_numbers(arg, room_id):
             else:
                 num = random_int(0, nums[0])
 
-    if num == -1:
-        num = string_to_number(arg)
+        if num == -1: num = string_to_number(arg)
 
-    if num == -1:
-        num = random_int(0, 999)
-
+    if num == -1: num = random_int(0, 999)
     input_path = get_path("numbers.png")
 
     command = [
@@ -274,7 +268,7 @@ async def gif_numbers(arg, room_id):
     await run_gifmaker(command, room_id)
 
 
-async def gif_date(who, room_id):
+async def gif_date(room_id):
     input_path = get_path("time.jpg")
 
     command = [
@@ -313,8 +307,7 @@ async def random_post(ws, room_id):
         # Select a random post
         post = posts[random_int(0, len(posts) - 1)]
         html = post.get("com", "")
-        if not html:
-            return
+        if not html: return
 
         # Parse HTML using BeautifulSoup
         soup = BeautifulSoup(html, "html.parser")
@@ -330,9 +323,9 @@ async def random_post(ws, room_id):
         # Get text content and limit to 500 characters
         text = soup.get_text(separator="\n")[:500].strip()
         text = clean_lines(text)
+        if not text: return
 
-        if text:
-            await send_message(ws, text, room_id)
+        await send_message(ws, text, room_id)
 
     except Exception as err:
         print(f"Error: {err}")
@@ -365,14 +358,11 @@ async def upload(path, room_id):
     }
 
     ext = get_extension(path)
-
-    if ext == "jpg":
-        ext = "jpeg"
-
+    ext = "jpeg" if ext == "jpg" else ext
     url = "https://deek.chat/message/send/" + str(room_id)
+
     data = aiohttp.FormData()
-    data.add_field(name="files[]", value=open(path, "rb"),
-                   filename=path.name, content_type=f"image/{ext}")
+    data.add_field(name="files[]", value=open(path, "rb"), filename=path.name, content_type=f"image/{ext}")
 
     try:
         async with aiohttp.ClientSession(cookies=cookies) as sess:
