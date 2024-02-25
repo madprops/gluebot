@@ -217,7 +217,7 @@ async def gif_describe(who, room_id):
         f"--input '{input_path}'",
         f"--words '{who} is\\n[Random] [x5]'",
         "--filter anyhue2 --opacity 0.8 --fontsize 66 --delay 700",
-        "--padding 50 --fontcolor light2 --bgcolor black --font comic",
+        "--padding 50 --fontcolor light2 --bgcolor black",
     ]
 
     await run_gifmaker(command, room_id)
