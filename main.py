@@ -18,6 +18,27 @@ HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
 password = os.environ.get("GLUEBOT_PASSWORD")
 
+headers = {
+    "User-Agent": "gluebot",
+    "Origin": "https://deek.chat",
+    "DNT": "1",
+}
+
+url = "https://deek.chat"
+ws_url = "wss://deek.chat/ws"
+prefix = ","
+token = None
+session = None
+delay = 3
+
+gifmaker = "/usr/bin/gifmaker"
+
+gm_common = [
+    "--width", 350,
+    "--output", "/tmp/gifmaker",
+    "--nogrow",
+]
+
 
 def get_time():
     return datetime.now().timestamp()
@@ -76,21 +97,12 @@ def string_to_number(input_string):
     return scaled_number
 
 
-headers = {
-    "User-Agent": "gluebot",
-    "Origin": "https://deek.chat",
-    "DNT": "1",
-}
+def gifmaker_command(args):
+    command = [gifmaker]
+    command.expand(gm_common)
+    command.expand(args)
+    return command
 
-url = "https://deek.chat"
-ws_url = "wss://deek.chat/ws"
-prefix = ","
-token = None
-session = None
-delay = 3
-
-gifmaker = "/usr/bin/gifmaker"
-gm_common = "--width 350 --nogrow --output /tmp/gifmaker"
 
 cmd_date = get_time()
 
@@ -209,30 +221,31 @@ async def random_bird(ws, room_id):
 
 
 async def gif_describe(who, room_id):
-    input_path = get_path("describe.jpg")
-
-    command = [
-        gifmaker,
-        gm_common,
-        f"--input '{input_path}'",
-        f"--words '{who} is\\n[Random] [x5]'",
-        "--filter anyhue2 --opacity 0.8 --fontsize 66 --delay 700",
-        "--padding 50 --fontcolor light2 --bgcolor black",
-    ]
+    command = gifmaker_command([
+        "--input", get_path("describe.jpg"),
+        "--words", f"{who} is\\n[Random] [x5]",
+        "--filter", "anyhue2",
+        "--opacity", 0.8,
+        "--fontsize", 66,
+        "--delay", 700,
+        "--padding", 50,
+        "--fontcolor", "light2",
+        "--bgcolor", "black",
+    ])
 
     await run_gifmaker(command, room_id)
 
 
 async def gif_wins(who, room_id):
-    input_path = get_path("wins.gif")
-
-    command = [
-        gifmaker,
-        gm_common,
-        f"--input '{input_path}'",
-        f"--words '{who} wins a ; [repeat] ; [RANDOM] ; [repeat]' --bgcolor 0,0,0",
-        "--bottom 20 --filter anyhue2 --framelist 11,11,33,33 --fontsize=42",
-    ]
+    command = gifmaker_command([
+        "--input", get_path("wins.gif"),
+        "--words", f"{who} wins a ; [repeat] ; [RANDOM] ; [repeat]",
+        "--bgcolor", "0,0,0",
+        "--bottom", 20,
+        "--filter", "anyhue2",
+        "--framelist", "11,11,33,33",
+        "--fontsize", 42,
+    ])
 
     await run_gifmaker(command, room_id)
 
@@ -258,29 +271,27 @@ async def gif_numbers(arg, room_id):
     if num == -1:
         num = random_int(0, 999)
 
-    input_path = get_path("numbers.png")
-
-    command = [
-        gifmaker,
-        gm_common,
-        f"--input '{input_path}'",
-        f"--top 20 --words '{num}' --fontcolor 0,0,0",
-        "--fontsize 66 --format jpg",
-    ]
+    command = gifmaker_command([
+        "--input", get_path("numbers.pnf"),
+        "--top", 20,
+        "--words", num,
+        "--fontcolor", "0,0,0",
+        "--fontsize", 66,
+        "--format", "jpg",
+    ])
 
     await run_gifmaker(command, room_id)
 
 
 async def gif_date(room_id):
-    input_path = get_path("time.jpg")
-
-    command = [
-        gifmaker,
-        gm_common,
-        f"--input '{input_path}'",
-        "--words 'Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]'",
-        "--filter anyhue2 --bottom 20 --bgcolor 0,0,0 --fontsize 80",
-    ]
+    command = gifmaker_command([
+        "--input", get_path("time.jpg"),
+        "--words", "Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]",
+        "--filter", "anyhue2",
+        "--bottom", 20,
+        "--bgcolor", "0,0,0",
+        "--fontsize", 80,
+    ])
 
     await run_gifmaker(command, room_id)
 
