@@ -124,6 +124,7 @@ def gifmaker_command(args):
 
 
 cmd_date = get_time()
+userlist = []
 
 
 def update_time():
@@ -149,11 +150,35 @@ def auth():
     headers["Cookie"] = token + "; " + session
 
 
+def update_userlist(message):
+    global userlist
+    message = json.loads(message)
+    event = message.get("type")
+
+    if event == "loadUsers":
+        userlist = []
+
+        for key in message["data"]:
+            room_users = message["data"][key]
+
+            for user in room_users:
+                name = user.get("name")
+
+                if name:
+                    userlist.append(name)
+    elif event == "enter":
+        name = message["data"].get("name")
+
+        if name and (name not in userlist):
+            userlist.append(name)
+
+
 async def run():
     async with websockets.connect(ws_url, extra_headers=headers) as ws:
         try:
             while True:
                 message = await ws.recv()
+                update_userlist(message)
                 await on_message(ws, message)
         except KeyboardInterrupt:
             exit(0)
@@ -193,7 +218,7 @@ async def on_message(ws, message):
 
         elif cmd == "help":
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost", room_id)
+            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who", room_id)
 
         elif cmd == "describe":
             if len(args) >= 1:
@@ -231,6 +256,10 @@ async def on_message(ws, message):
         elif cmd == "post" or cmd == "shitpost" or cmd == "4chan" or cmd == "anon" or cmd == "shit":
             update_time()
             await random_post(ws, room_id)
+
+        elif cmd == "who" or cmd == "pick" or cmd == "any" or cmd == "user" or cmd == "username":
+            update_time()
+            await gif_user(room_id)
 
 
 async def random_bird(ws, room_id):
@@ -313,6 +342,27 @@ async def gif_date(room_id):
         "--bottom", 20,
         "--bgcolor", "0,0,0",
         "--fontsize", 80,
+    ])
+
+    await run_gifmaker(command, room_id)
+
+
+async def gif_user(room_id):
+    user = random.choice(userlist)
+    what = random.choice(["based", "cringe"])
+
+    command = gifmaker_command([
+        "--input", get_path("nerd.jpg"),
+        "--words", f"{user} is [x2] ; {what} [x2]",
+        "--filter", "anyhue2",
+        "--bottom", 20,
+        "--fontcolor", "light2",
+        "--bgcolor", "darkfont2",
+        "--outline", "font",
+        "--deepfry",
+        "--font", "nova",
+        "--fontsize", 45,
+        "--opacity", 0.8,
     ])
 
     await run_gifmaker(command, room_id)
