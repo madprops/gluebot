@@ -353,17 +353,16 @@ async def gif_user(room_id):
 
     command = gifmaker_command([
         "--input", get_path("nerd.jpg"),
-        "--words", f"{user} is ; {what}",
+        "--words", f"{user} is [x2] ; {what} [x2]",
         "--filter", "anyhue2",
         "--bottom", 20,
-        "--fontcolor", "light2",
-        "--bgcolor", "darkfont2",
+        "--fontcolor", "light",
+        "--bgcolor", "darkfont",
         "--outline", "font",
         "--deepfry",
         "--font", "nova",
         "--fontsize", 45,
         "--opacity", 0.8,
-        "--delay", 1250,
     ])
 
     await run_gifmaker(command, room_id)
