@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import aiofiles
-import shlex
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
