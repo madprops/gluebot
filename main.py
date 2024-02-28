@@ -5,7 +5,6 @@ import json
 import re
 import httpx
 import traceback
-import subprocess
 import os
 import aiohttp
 import random
@@ -13,6 +12,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import aiofiles
+import shlex
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
@@ -31,9 +31,8 @@ token = None
 session = None
 delay = 3
 
-gifmaker = "/usr/bin/gifmaker"
-
-gm_common = [
+gifmaker_common = [
+    "/usr/bin/gifmaker",
     "--width", 350,
     "--output", "/tmp/gifmaker",
     "--nogrow",
@@ -97,11 +96,14 @@ def string_to_number(input_string):
     return scaled_number
 
 
+def join_command(command):
+    return " ".join(f"\"{arg}\"" for arg in command)
+
+
 def gifmaker_command(args):
-    command = [gifmaker]
-    command.expand(gm_common)
-    command.expand(args)
-    return command
+    command = gifmaker_common.copy()
+    command.extend(args)
+    return join_command(command)
 
 
 cmd_date = get_time()
@@ -351,9 +353,9 @@ async def random_post(ws, room_id):
 
 async def run_gifmaker(command, room_id):
     process = await asyncio.create_subprocess_shell(
-        " ".join(command),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
         shell=True,
     )
 
