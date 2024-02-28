@@ -95,8 +95,26 @@ def string_to_number(input_string):
     return scaled_number
 
 
+def clean_string(string):
+    return string.replace("&#34;", '"')
+
+
+def escape_quotes(string):
+    return string.replace('"', '\\"')
+
+
+def remove_char(string, char):
+    return string.replace(char, "")
+
+
+def clean_gifmaker(arg):
+    arg = clean_string(arg)
+    arg = remove_char(arg, ";")
+    return arg
+
+
 def join_command(command):
-    return " ".join(f"\"{arg}\"" for arg in command)
+    return " ".join(f'"{arg}"' for arg in command)
 
 
 def gifmaker_command(args):
@@ -181,12 +199,14 @@ async def on_message(ws, message):
             if len(args) >= 1:
                 update_time()
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
                 await gif_describe(arg, room_id)
 
         elif cmd == "wins" or cmd == "win":
             if len(args) >= 1:
                 update_time()
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
                 await gif_wins(arg, room_id)
 
         elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
@@ -197,6 +217,7 @@ async def on_message(ws, message):
             else:
                 arg = None
 
+            arg = clean_gifmaker(arg)
             await gif_numbers(arg, room_id)
 
         elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
