@@ -205,7 +205,7 @@ async def on_message(ws, message):
 
     try:
         data = json.loads(message)
-    except:
+    except BaseException:
         return
 
     if data["type"] == "message":
@@ -418,8 +418,8 @@ async def random_post(ws, room_id):
         for br in soup.find_all("br"):
             br.replace_with("\n")
 
-        # Get text content and limit to 500 characters
-        text = soup.get_text(separator="\n")[:500].strip()
+        # Get the text content
+        text = soup.get_text(separator="\n").strip()
         text = clean_lines(text)
 
         if not text:
