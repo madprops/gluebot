@@ -171,6 +171,11 @@ def update_userlist(message):
 
         if name and (name not in userlist):
             userlist.append(name)
+    elif event == "exit":
+        name = message["data"].get("name")
+
+        if name and (name in userlist):
+            userlist.remove(name)
 
 
 async def run():
