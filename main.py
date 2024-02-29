@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import aiofiles
+import sys
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
@@ -38,6 +39,10 @@ gifmaker_common = [
 ]
 
 
+def msg(message: str) -> None:
+    print(message, file=sys.stderr)
+
+
 def get_time():
     return datetime.now().timestamp()
 
@@ -46,7 +51,7 @@ def remove_file(path):
     try:
         path.unlink()
     except Exception as e:
-        print(f"(Remove) Error: {e}")
+        msg(f"(Remove) Error: {e}")
         traceback.print_exc()
 
 
@@ -140,7 +145,7 @@ def auth():
     global token, session, headers
 
     if not username or not password:
-        print("Missing environment variables")
+        msg("Missing environment variables")
         exit(1)
 
     data = {"name": username, "password": password, "submit": "log+in"}
@@ -188,9 +193,9 @@ async def run():
         except KeyboardInterrupt:
             exit(0)
         except websockets.exceptions.ConnectionClosedOK:
-            print("WebSocket connection closed")
+            msg("WebSocket connection closed")
         except Exception as e:
-            print("(WebSocket) Error:", e)
+            msg("(WebSocket) Error:", e)
             traceback.print_exc()
 
 
@@ -423,7 +428,7 @@ async def random_post(ws, room_id):
         await send_message(ws, text, room_id)
 
     except Exception as err:
-        print(f"Error: {err}")
+        msg(f"Error: {err}")
 
 
 async def run_gifmaker(command, room_id):
@@ -437,7 +442,7 @@ async def run_gifmaker(command, room_id):
     stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
-        print(f"(Process) Error: {stderr.decode()}")
+        msg(f"(Process) Error: {stderr.decode()}")
         return
 
     await upload(Path(stdout.decode().strip()), room_id)
@@ -464,7 +469,7 @@ async def upload(path, room_id):
             async with sess.post(url, data=data, headers={}) as response:
                 await response.text()
     except Exception as e:
-        print(f"(Upload) Error: {e}")
+        msg(f"(Upload) Error: {e}")
         traceback.print_exc()
 
     remove_file(path)
@@ -476,10 +481,10 @@ async def send_message(ws, text, room_id):
 while True:
     try:
         auth()
-        print("Authenticated")
+        msg("Authenticated")
         asyncio.run(run())
     except KeyboardInterrupt:
         break
     except Exception as e:
-        print("(Main) Error:", e)
+        msg("(Main) Error:", e)
         traceback.print_exc()
