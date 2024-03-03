@@ -243,6 +243,9 @@ async def on_message(ws, message):
                 arg = " ".join(clean_list(args))
                 arg = clean_gifmaker(arg)
                 await gif_wins(arg, room_id)
+            else:
+                update_time()
+                await gif_wins(None, room_id)
 
         elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
             update_time()
@@ -298,6 +301,9 @@ async def gif_describe(who, room_id):
 
 
 async def gif_wins(who, room_id):
+    if not who:
+        who = random.choice(userlist)
+
     command = gifmaker_command([
         "--input", get_path("wins.gif"),
         "--words", f"{who} wins a ; [repeat] ; [RANDOM] ; [repeat]",
