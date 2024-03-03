@@ -272,7 +272,13 @@ async def on_message(ws, message):
 
         elif cmd == "who" or cmd == "pick" or cmd == "any" or cmd == "user" or cmd == "username":
             update_time()
-            await gif_user(room_id)
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+            else:
+                arg = None
+
+            await gif_user(arg, room_id)
 
 
 async def random_bird(ws, room_id):
@@ -363,13 +369,15 @@ async def gif_date(room_id):
     await run_gifmaker(command, room_id)
 
 
-async def gif_user(room_id):
-    user = random.choice(userlist)
+async def gif_user(who, room_id):
+    if not who:
+        who = random.choice(userlist)
+
     what = random.choice(["based", "cringe"])
 
     command = gifmaker_command([
         "--input", get_path("nerd.jpg"),
-        "--words", f"{user} is [x2] ; {what} [x2]",
+        "--words", f"{who} is [x2] ; {what} [x2]",
         "--filter", "anyhue2",
         "--bottom", 20,
         "--fontcolor", "light2",
