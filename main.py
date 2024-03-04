@@ -236,7 +236,7 @@ async def on_message(ws, message):
 
         elif cmd in ["help"]:
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who", room_id)
+            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when", room_id)
 
         elif cmd in ["describe"]:
             if len(args) >= 1:
