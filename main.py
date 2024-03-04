@@ -9,7 +9,7 @@ import os
 import aiohttp
 import random
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import aiofiles
 import sys
@@ -68,6 +68,14 @@ def clean_lines(s):
 
 def random_int(min_val, max_val):
     return random.randint(min_val, max_val)
+
+
+def random_date():
+    current_date = datetime.now()
+    end_date = current_date + timedelta(days=36525)  # 365 days * 100 years
+    random_days = random.randint(0, (end_date - current_date).days)
+    random_date = current_date + timedelta(days=random_days)
+    return random_date.strftime("%d %b %Y")
 
 
 def get_path(name):
@@ -222,22 +230,22 @@ async def on_message(ws, message):
         cmd = words[0]
         args = words[1:]
 
-        if cmd == "ping":
+        if cmd in ["ping"]:
             update_time()
             await send_message(ws, "Pong!", room_id)
 
-        elif cmd == "help":
+        elif cmd in ["help"]:
             update_time()
             await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who", room_id)
 
-        elif cmd == "describe":
+        elif cmd in ["describe"]:
             if len(args) >= 1:
                 update_time()
                 arg = " ".join(clean_list(args))
                 arg = clean_gifmaker(arg)
                 await gif_describe(arg, room_id)
 
-        elif cmd == "wins" or cmd == "win":
+        elif cmd in ["wins", "win"]:
             if len(args) >= 1:
                 update_time()
                 arg = " ".join(clean_list(args))
@@ -247,7 +255,7 @@ async def on_message(ws, message):
                 update_time()
                 await gif_wins(None, room_id)
 
-        elif cmd == "numbers" or cmd == "number" or cmd == "nums" or cmd == "num":
+        elif cmd in ["numbers", "number", "nums", "num"]:
             update_time()
 
             if len(args) > 0:
@@ -258,19 +266,11 @@ async def on_message(ws, message):
             arg = clean_gifmaker(arg)
             await gif_numbers(arg, room_id)
 
-        elif cmd == "date" or cmd == "data" or cmd == "time" or cmd == "datetime":
+        elif cmd in ["date", "data", "time", "datetime"]:
             update_time()
             await gif_date(room_id)
 
-        elif cmd == "bird" or cmd == "birds" or cmd == "birb" or cmd == "birbs" or cmd == "brb":
-            update_time()
-            await random_bird(ws, room_id)
-
-        elif cmd == "post" or cmd == "shitpost" or cmd == "4chan" or cmd == "anon" or cmd == "shit":
-            update_time()
-            await random_post(ws, room_id)
-
-        elif cmd == "who" or cmd == "pick" or cmd == "any" or cmd == "user" or cmd == "username":
+        elif cmd in ["who", "pick", "any", "user", "username"]:
             update_time()
 
             if len(args) > 0:
@@ -279,6 +279,24 @@ async def on_message(ws, message):
                 arg = None
 
             await gif_user(arg, room_id)
+
+        elif cmd in ["when", "die", "death"]:
+            update_time()
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+            else:
+                arg = None
+
+            await gif_when(arg, room_id)
+
+        elif cmd in ["bird", "birds", "birb", "birbs", "brb"]:
+            update_time()
+            await random_bird(ws, room_id)
+
+        elif cmd in ["post", "shitpost", "4chan", "anon", "shit"]:
+            update_time()
+            await random_post(ws, room_id)
 
 
 async def random_bird(ws, room_id):
@@ -387,6 +405,29 @@ async def gif_user(who, room_id):
         "--font", "nova",
         "--fontsize", 45,
         "--opacity", 0.8,
+    ])
+
+    await run_gifmaker(command, room_id)
+
+
+async def gif_when(who, room_id):
+    if not who:
+        who = random.choice(userlist)
+
+    date = random_date()
+
+    command = gifmaker_command([
+        "--input", get_path("sky.jpg"),
+        "--words", f"{who} will die [x2] ; {date} [x2]",
+        "--filter", "anyhue2",
+        "--bottom", 60,
+        "--fontcolor", "light2",
+        "--bgcolor", "darkfont2",
+        "--outline", "font",
+        "--font", "nova",
+        "--fontsize", 60,
+        "--opacity", 0.8,
+        "--wrap", 25,
     ])
 
     await run_gifmaker(command, room_id)
