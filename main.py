@@ -479,7 +479,7 @@ async def random_post(ws, room_id):
         text = clean_lines(text)
 
         if not text:
-            return
+            text = f"https://boards.4chan.org/{board}/thread/{id}"
 
         await send_message(ws, text, room_id)
 
