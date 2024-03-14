@@ -32,7 +32,7 @@ session = None
 delay = 3
 
 gifmaker_common = [
-    "/usr/bin/gifmaker",
+    "gifmaker",
     "--width", 350,
     "--output", "/tmp/gifmaker",
     "--nogrow",
