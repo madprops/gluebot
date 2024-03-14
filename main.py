@@ -32,7 +32,7 @@ session = None
 delay = 3
 
 gifmaker_common = [
-    str(Path("~/.local/bin/gifmaker").expanduser().resolve()),
+    "gifmaker",
     "--width", 350,
     "--output", "/tmp/gifmaker",
     "--nogrow",
