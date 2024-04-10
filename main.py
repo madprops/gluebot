@@ -458,7 +458,7 @@ async def shitpost(ws, room_id):
 
         # Select a random post
         post = posts[random_int(0, len(posts) - 1)]
-        print(post)
+        number = post.get("no", "")
         html = post.get("com", "")
 
         if not html:
@@ -483,6 +483,8 @@ async def shitpost(ws, room_id):
 
         if not text:
             text = url
+        else:
+            text = f"{text}\n{url}"
 
         await send_message(ws, text, room_id)
 
