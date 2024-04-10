@@ -297,7 +297,7 @@ async def on_message(ws, message):
 
         elif cmd in ["post", "shitpost", "4chan", "anon", "shit"]:
             update_time()
-            await random_post(ws, room_id)
+            await shitpost(ws, room_id)
 
 
 async def random_bird(ws, room_id):
@@ -434,7 +434,7 @@ async def gif_when(who, room_id):
     await run_gifmaker(command, room_id)
 
 
-async def random_post(ws, room_id):
+async def shitpost(ws, room_id):
     boards = ["g", "an", "ck", "lit", "x", "tv", "v", "fit", "k", "o"]
     board = random.choice(boards)
 
@@ -458,6 +458,7 @@ async def random_post(ws, room_id):
 
         # Select a random post
         post = posts[random_int(0, len(posts) - 1)]
+        print(post)
         html = post.get("com", "")
 
         if not html:
@@ -477,9 +478,11 @@ async def random_post(ws, room_id):
         # Get the text content
         text = soup.get_text(separator="\n").strip()
         text = clean_lines(text)
+        number = "123"
+        url = f"https://boards.4chan.org/{board}/thread/{id}#p{number}"
 
         if not text:
-            text = f"https://boards.4chan.org/{board}/thread/{id}"
+            text = url
 
         await send_message(ws, text, room_id)
 
