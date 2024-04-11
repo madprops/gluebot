@@ -478,7 +478,6 @@ async def shitpost(ws, room_id):
         # Get the text content
         text = soup.get_text(separator="\n").strip()
         text = clean_lines(text)
-        number = "123"
         url = f">boards.4chan.org/{board}/thread/{id}#p{number}"
 
         if not text:
