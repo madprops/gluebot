@@ -373,6 +373,7 @@ async def make_meme(ws, arg, room_id):
                     "--font", "nova",
                     "--frames", 3,
                     "--fillgen",
+                    "--word-color-mode", "random",
                 ])
 
                 await run_gifmaker(command, room_id)
