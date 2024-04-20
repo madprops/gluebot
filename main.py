@@ -337,7 +337,7 @@ async def on_message(ws, message):
             update_time()
             await shitpost(ws, room_id)
 
-        elif cmd in ["write", "writer", "text", "meme"]:
+        elif cmd in ["write", "writer", "words", "text", "meme"]:
             update_time()
 
             if len(args) > 0:
