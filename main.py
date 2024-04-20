@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import aiofiles
 import sys
+import tempfile
 
 HERE = Path(__file__).parent
 username = os.environ.get("GLUEBOT_USERNAME")
@@ -30,6 +31,8 @@ prefix = ","
 token = None
 session = None
 delay = 3
+last_file = None
+last_file_ext = None
 
 gifmaker_common = [
     "gifmaker",
@@ -209,15 +212,37 @@ async def run():
 
 
 async def on_message(ws, message):
-    if blocked():
-        return
+    global last_file, last_file_ext
 
     try:
         data = json.loads(message)
     except BaseException:
         return
 
-    if data["type"] in ["message", "messageEnd"]:
+    if data["type"] == "files":
+        dta = data.get("data")
+
+        if not dta:
+            return
+
+        files = dta.get("files")
+
+        if not files:
+            return
+
+        first = files[0]
+        name = first.get("name")
+        ext = first.get("extension")
+
+        if (not name) or (not ext):
+            return
+
+        last_file = f"https://deek.chat/storage/files/{name}"
+        last_file_ext = ext
+    elif data["type"] in ["message", "messageEnd"]:
+        if blocked():
+            return
+
         if data["data"]["name"] == username:
             return
 
@@ -298,6 +323,57 @@ async def on_message(ws, message):
         elif cmd in ["post", "shitpost", "4chan", "anon", "shit"]:
             update_time()
             await shitpost(ws, room_id)
+
+        elif cmd in ["write", "text", "meme"]:
+            if len(args) > 0:
+                update_time()
+                arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
+                await make_meme(ws, arg, room_id)
+
+
+async def make_meme(ws, arg, room_id):
+    if not last_file:
+        return
+
+    try:
+        url = last_file
+
+        await send_message(ws, "Generating gif...", room_id)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=last_file_ext) as temp_file:
+                    while True:
+                        chunk = await response.content.read(1024)
+                        if not chunk:
+                            break
+                        temp_file.write(chunk)
+
+                file_name = temp_file.name
+
+                command = gifmaker_command([
+                    "--input", file_name,
+                    "--words", arg,
+                    "--filter", "anyhue2",
+                    "--opacity", 0.8,
+                    "--fontsize", 60,
+                    "--delay", 700,
+                    "--padding", 30,
+                    "--fontcolor", "light2",
+                    "--bgcolor", "black",
+                    "--bottom", 30,
+                    "--font", "nova",
+                    "--frames", 3,
+                    "--fillgen",
+                ])
+
+                await run_gifmaker(command, room_id)
+                os.remove(file_name)
+
+    except Exception as e:
+        print("Error:", e)
+        return None
 
 
 async def random_bird(ws, room_id):
