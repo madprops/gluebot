@@ -247,6 +247,9 @@ async def on_message(ws, message):
         if (not name) or (not ext):
             return
 
+        if ext not in [".jpg", ".jpeg", ".png", ".gif", ".webm", ".mp4"]:
+            return
+
         last_file = f"https://deek.chat/storage/files/{name}"
         last_file_ext = ext
     elif data["type"] in ["message", "messageEnd"]:
