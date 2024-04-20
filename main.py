@@ -368,7 +368,7 @@ async def make_meme(ws, arg, room_id):
                         temp_file.write(chunk)
 
                 file_name = temp_file.name
-                words = arg if arg else "[Random] [x2]"
+                words = arg if arg else "[Random] [Random]"
 
                 command = gifmaker_command([
                     "--input", file_name,
