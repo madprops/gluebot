@@ -362,7 +362,7 @@ async def make_meme(ws, arg, room_id):
                 command = gifmaker_command([
                     "--input", file_name,
                     "--words", arg,
-                    "--filterne", "anyhue2",
+                    "--filter", "anyhue2",
                     "--opacity", 0.8,
                     "--fontsize", 60,
                     "--delay", 700,
