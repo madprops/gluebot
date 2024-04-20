@@ -335,11 +335,15 @@ async def on_message(ws, message):
             await shitpost(ws, room_id)
 
         elif cmd in ["write", "writer", "text", "meme"]:
+            update_time()
+
             if len(args) > 0:
-                update_time()
                 arg = " ".join(clean_list(args))
                 arg = clean_gifmaker(arg)
-                await make_meme(ws, arg, room_id)
+            else:
+                arg = None
+
+            await make_meme(ws, arg, room_id)
 
 
 async def make_meme(ws, arg, room_id):
@@ -361,10 +365,11 @@ async def make_meme(ws, arg, room_id):
                         temp_file.write(chunk)
 
                 file_name = temp_file.name
+                words = arg if arg else "[Random] [x2]"
 
                 command = gifmaker_command([
                     "--input", file_name,
-                    "--words", arg,
+                    "--words", words,
                     "--filter", "anyhue2",
                     "--opacity", 0.8,
                     "--fontsize", 60,
