@@ -226,15 +226,15 @@ async def on_message(ws, message):
     except BaseException:
         return
 
-    if data["data"]["name"] == username:
+    dta = data.get("data")
+
+    if not dta:
+        return
+
+    if dta.get("name") == username:
         return
 
     if data["type"] == "files":
-        dta = data.get("data")
-
-        if not dta:
-            return
-
         files = dta.get("files")
 
         if not files:
@@ -253,7 +253,7 @@ async def on_message(ws, message):
         if blocked():
             return
 
-        text = data["data"]["text"].strip()
+        text = dta["text"].strip()
 
         if not text.startswith(prefix):
             return
