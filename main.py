@@ -113,7 +113,14 @@ def string_to_number(input_string):
 
 
 def clean_string(string):
-    return string.replace("&#34;", '"')
+    string = string.replace("&#34;", '"')
+    string = string.replace("&#39;", "'")
+    string = string.replace("&quot;", '"')
+    string = string.replace("&apos;", "'")
+    string = string.replace("&amp;", "&")
+    string = string.replace("&lt;", "<")
+    string = string.replace("&gt;", ">")
+    return string
 
 
 def escape_quotes(string):
@@ -262,7 +269,7 @@ async def on_message(ws, message):
 
         elif cmd in ["help"]:
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when", room_id)
+            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write", room_id)
 
         elif cmd in ["describe"]:
             if len(args) >= 1:
@@ -324,7 +331,7 @@ async def on_message(ws, message):
             update_time()
             await shitpost(ws, room_id)
 
-        elif cmd in ["write", "text", "meme"]:
+        elif cmd in ["write", "writer", "text", "meme"]:
             if len(args) > 0:
                 update_time()
                 arg = " ".join(clean_list(args))
@@ -355,7 +362,7 @@ async def make_meme(ws, arg, room_id):
                 command = gifmaker_command([
                     "--input", file_name,
                     "--words", arg,
-                    "--filter", "anyhue2",
+                    "--filterne", "anyhue2",
                     "--opacity", 0.8,
                     "--fontsize", 60,
                     "--delay", 700,
