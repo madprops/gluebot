@@ -226,6 +226,9 @@ async def on_message(ws, message):
     except BaseException:
         return
 
+    if data["data"]["name"] == username:
+        return
+
     if data["type"] == "files":
         dta = data.get("data")
 
@@ -248,9 +251,6 @@ async def on_message(ws, message):
         last_file_ext = ext
     elif data["type"] in ["message", "messageEnd"]:
         if blocked():
-            return
-
-        if data["data"]["name"] == username:
             return
 
         text = data["data"]["text"].strip()
