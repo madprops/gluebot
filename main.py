@@ -348,6 +348,68 @@ async def on_message(ws, message):
 
             await make_meme(ws, arg, room_id)
 
+        elif cmd in ["video", "vid"]:
+            update_time()
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
+            else:
+                arg = None
+
+            await make_video(ws, arg, room_id)
+
+
+async def make_video(ws, arg, room_id):
+    if not last_file:
+        return
+
+    try:
+        url = last_file
+
+        await send_message(ws, "Generating video...", room_id)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=last_file_ext) as temp_file:
+                    while True:
+                        chunk = await response.content.read(1024)
+                        if not chunk:
+                            break
+                        temp_file.write(chunk)
+
+                file_name = temp_file.name
+
+                words = arg if arg else ""
+
+                if words == "random":
+                    words = "[Random] [Random]"
+
+                command = gifmaker_command([
+                    "--input", file_name,
+                    "--words", words,
+                    "--filter", "anyhue2",
+                    "--opacity", 0.8,
+                    "--fontsize", 60,
+                    "--delay", 600,
+                    "--padding", 30,
+                    "--fontcolor", "light2",
+                    "--bgcolor", "black",
+                    "--bottom", 30,
+                    "--font", "nova",
+                    "--frames", 18,
+                    "--fillgen",
+                    "--word-color-mode", "random",
+                    "--output", "/tmp/gifmaker.webm",
+                ])
+
+                await run_gifmaker(command, room_id)
+                os.remove(file_name)
+
+    except Exception as e:
+        print("Error:", e)
+        return None
+
 
 async def make_meme(ws, arg, room_id):
     if not last_file:
