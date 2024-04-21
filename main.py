@@ -400,7 +400,7 @@ async def make_video(ws, arg, room_id):
                     "--frames", 18,
                     "--fillgen",
                     "--word-color-mode", "random",
-                    "--width", 555,
+                    "--width", 600,
                     "--output", "/tmp/gifmaker.webm",
                 ])
 
