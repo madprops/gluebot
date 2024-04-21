@@ -683,7 +683,13 @@ async def upload(path, room_id):
     url = "https://deek.chat/message/send/" + str(room_id)
 
     data = aiohttp.FormData()
-    data.add_field(name="files[]", value=open(path, "rb"), filename=path.name, content_type=f"image/{ext}")
+
+    if ext in ["webm", "mp4"]:
+        ctype = f"video/{ext}"
+    else:
+        ctype = f"image/{ext}"
+
+    data.add_field(name="files[]", value=open(path, "rb"), filename=path.name, content_type=ctype)
 
     try:
         async with aiohttp.ClientSession(cookies=cookies) as sess:
