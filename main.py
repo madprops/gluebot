@@ -380,7 +380,7 @@ async def gallo_gif(ws, arg, room_id):
         "--fontcolor", "black",
         "--order", "normal",
         "--top", 20,
-        "--frames", 20,
+        "--frames", 30,
         "--fillwords",
     ])
 
