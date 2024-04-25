@@ -359,6 +359,33 @@ async def on_message(ws, message):
 
             await make_video(ws, arg, room_id)
 
+        elif cmd in ["gallo", "rooster", "chicken"]:
+            update_time()
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
+            else:
+                arg = None
+
+            await gallo_gif(ws, arg, room_id)
+
+
+async def gallo_gif(ws, arg, room_id):
+    command = gifmaker_command([
+        "--input", get_path("gallo.gif"),
+        "--words", arg,
+        "--fontsize", 28,
+        "--delay", 10,
+        "--fontcolor", "black",
+        "--order", "normal",
+        "--top", 20,
+        "--frames", 20,
+        "--fillwords",
+    ])
+
+    await run_gifmaker(command, room_id)
+
 
 async def make_video(ws, arg, room_id):
     if not last_file:
