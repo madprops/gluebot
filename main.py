@@ -33,6 +33,8 @@ session = None
 delay = 3
 last_file = None
 last_file_ext = None
+bird_data = []
+places_data = []
 
 gifmaker_common = [
     "gifmaker",
@@ -80,6 +82,11 @@ def random_date():
     random_days = random.randint(0, (end_date - current_date).days)
     random_date = current_date + timedelta(days=random_days)
     return random_date.strftime("%d %b %Y")
+
+
+def random_country():
+    item = random.choice(places_data)
+    return item["countryName"]
 
 
 def get_path(name):
@@ -275,7 +282,7 @@ async def on_message(ws, message):
 
         elif cmd in ["help"]:
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write", room_id)
+            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write | video | where", room_id)
 
         elif cmd in ["describe"]:
             if len(args) >= 1:
@@ -369,6 +376,16 @@ async def on_message(ws, message):
                 arg = None
 
             await gallo_gif(ws, arg, room_id)
+
+        elif cmd in ["where", "place", "going"]:
+            update_time()
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+            else:
+                arg = None
+
+            await gif_where(arg, room_id)
 
 
 async def gallo_gif(ws, arg, room_id):
@@ -490,12 +507,8 @@ async def make_meme(ws, arg, room_id):
 
 
 async def random_bird(ws, room_id):
-    birdfile = get_path("data/aves.txt")
-
-    async with aiofiles.open(birdfile, mode="r", encoding="utf-8") as file:
-        birds = await file.readlines()
-        bird = random.choice(birds).strip()
-        await send_message(ws, f".i \"{bird}\" bird", room_id)
+    bird = random.choice(bird_data).strip()
+    await send_message(ws, f".i \"{bird}\" bird", room_id)
 
 
 async def gif_describe(who, room_id):
@@ -623,6 +636,29 @@ async def gif_when(who, room_id):
     await run_gifmaker(command, room_id)
 
 
+async def gif_where(who, room_id):
+    if not who:
+        who = random.choice(userlist)
+
+    place = random_country()
+
+    command = gifmaker_command([
+        "--input", get_path("place.jpg"),
+        "--words", f"{who} is going to [x2] ; {place} [x2]",
+        "--filter", "anyhue2",
+        "--bottom", 66,
+        "--fontcolor", "light2",
+        "--bgcolor", "darkfont2",
+        "--outline", "font",
+        "--font", "nova",
+        "--fontsize", 70,
+        "--opacity", 0.8,
+        "--wrap", 25,
+    ])
+
+    await run_gifmaker(command, room_id)
+
+
 async def shitpost(ws, room_id):
     boards = ["g", "an", "ck", "lit", "x", "tv", "v", "fit", "k", "o"]
     board = random.choice(boards)
@@ -732,6 +768,12 @@ async def upload(path, room_id):
 
 async def send_message(ws, text, room_id):
     await ws.send(json.dumps({"type": "message", "data": text, "roomId": room_id}))
+
+birdfile = get_path("data/aves.txt")
+bird_data = open(birdfile, "r").readlines()
+
+places_file = get_path("data/places.json")
+places_data = json.load(open(places_file, "r"))
 
 while True:
     try:
