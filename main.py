@@ -660,7 +660,7 @@ async def gif_where(who, room_id):
 
 
 async def shitpost(ws, room_id):
-    boards = ["g", "an", "ck", "lit", "x", "tv", "v", "fit", "k", "o"]
+    boards = ["g", "an", "ck", "lit", "x", "tv", "v", "fit", "k", "o", "sci", "his"]
     board = random.choice(boards)
 
     try:
