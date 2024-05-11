@@ -76,11 +76,10 @@ def random_int(min_val, max_val):
 
 
 def random_date():
-    one_hundred = 36525
-    current_date = datetime.now()
-    end_date = current_date + timedelta(days=(one_hundred // 2))
-    random_days = random.randint(0, (end_date - current_date).days)
-    random_date = current_date + timedelta(days=random_days)
+    start_date = datetime.now() - timedelta(years=2)
+    end_date = start_date + timedelta(years=12)
+    random_days = random.randint(0, (end_date - start_date).days)
+    random_date = start_date + timedelta(days=random_days)
     return random_date.strftime("%d %b %Y")
 
 
