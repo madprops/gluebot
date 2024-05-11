@@ -11,7 +11,6 @@ import random
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from pathlib import Path
-import aiofiles
 import sys
 import tempfile
 
@@ -76,8 +75,10 @@ def random_int(min_val, max_val):
 
 
 def random_date():
-    start_date = datetime.now() - timedelta(years=2)
-    end_date = start_date + timedelta(years=12)
+    two_years = 730
+    twelve_years = 4380
+    start_date = datetime.now() - timedelta(days=two_years)
+    end_date = start_date + timedelta(days=(twelve_years))
     random_days = random.randint(0, (end_date - start_date).days)
     random_date = start_date + timedelta(days=random_days)
     return random_date.strftime("%d %b %Y")
