@@ -566,7 +566,7 @@ async def gif_numbers(arg, room_id):
         num = random_int(0, 999)
 
     command = gifmaker_command([
-        "--input", get_path("numbers.pnf"),
+        "--input", get_path("numbers.png"),
         "--top", 20,
         "--words", num,
         "--fontcolor", "0,0,0",
