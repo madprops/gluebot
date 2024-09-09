@@ -220,7 +220,7 @@ async def run():
         except websockets.exceptions.ConnectionClosedOK:
             msg("WebSocket connection closed")
         except Exception as e:
-            msg("(WebSocket) Error:" e)
+            msg(f"(WebSocket) Error: {e}")
             traceback.print_exc()
 
 
