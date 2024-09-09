@@ -305,10 +305,10 @@ async def on_message(ws, message):
 
             if len(args) > 0:
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
             else:
                 arg = None
 
-            arg = clean_gifmaker(arg)
             await gif_numbers(arg, room_id)
 
         elif cmd in ["date", "data", "time", "datetime"]:
