@@ -118,7 +118,6 @@ def string_to_number(input_string):
     scaled_number = absolute_hash % 1000
     return scaled_number
 
-
 def clean_string(string):
     string = string.replace("&#34;", '"')
     string = string.replace("&#39;", "'")
@@ -221,7 +220,7 @@ async def run():
         except websockets.exceptions.ConnectionClosedOK:
             msg("WebSocket connection closed")
         except Exception as e:
-            msg("(WebSocket) Error:", e)
+            msg("(WebSocket) Error:" e)
             traceback.print_exc()
 
 
