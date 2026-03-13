@@ -8,6 +8,7 @@ import traceback
 import os
 import aiohttp
 import random
+import time
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -36,10 +37,15 @@ bird_data = []
 places_data = []
 
 gifmaker_common = [
-    "gifmaker",
+    "/home/botdude/.local/bin/gifmaker",
     "--width", 350,
     "--output", "/tmp/gifmaker",
     "--nogrow",
+]
+
+oracle_common = [
+    "node",
+    "/home/botdude/oracle/video.js",
 ]
 
 
@@ -149,6 +155,12 @@ def join_command(command):
 
 def gifmaker_command(args):
     command = gifmaker_common.copy()
+    command.extend(args)
+    return join_command(command)
+
+
+def oracle_command(args):
+    command = oracle_common.copy()
     command.extend(args)
     return join_command(command)
 
@@ -281,7 +293,7 @@ async def on_message(ws, message):
 
         elif cmd in ["help"]:
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write | video | where | gallo", room_id)
+            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write | video | where | gallo | oracle", room_id)
 
         elif cmd in ["describe"]:
             if len(args) >= 1:
@@ -376,6 +388,17 @@ async def on_message(ws, message):
 
             await gallo_gif(ws, arg, room_id)
 
+        elif cmd in ["oracle", "fortune"]:
+            update_time()
+
+            if len(args) > 0:
+                arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
+            else:
+                arg = None
+
+            await oracle_video(ws, arg, room_id)
+
         elif cmd in ["where", "place", "going"]:
             update_time()
 
@@ -401,6 +424,11 @@ async def gallo_gif(ws, arg, room_id):
     ])
 
     await run_gifmaker(command, room_id)
+
+
+async def oracle_video(ws, arg, room_id):
+    command = oracle_command([])
+    await run_oracle(command, room_id)
 
 
 async def make_video(ws, arg, room_id):
@@ -732,6 +760,23 @@ async def run_gifmaker(command, room_id):
     await upload(Path(stdout.decode().strip()), room_id)
 
 
+async def run_oracle(command, room_id):
+    process = await asyncio.create_subprocess_shell(
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        shell=True,
+    )
+
+    stdout, stderr = await process.communicate()
+
+    if process.returncode != 0:
+        msg(f"(Process) Error: {stderr.decode()}")
+        return
+
+    await upload(Path(stdout.decode().strip()), room_id)
+
+
 async def upload(path, room_id):
     if (not path.exists()) or (not path.is_file()):
         return
@@ -779,8 +824,17 @@ while True:
         auth()
         msg("Authenticated")
         asyncio.run(run())
+
+        # This handles when run() exits normally after a disconnect
+        msg("Disconnected. Reconnecting in 15 seconds...")
+        time.sleep(15)
+
     except KeyboardInterrupt:
         break
     except Exception as e:
-        msg("(Main) Error:", e)
+        msg(f"(Main) Error: {e}")
         traceback.print_exc()
+
+        # This handles when auth() or the initial connection fails
+        msg("Error caught. Reconnecting in 15 seconds...")
+        time.sleep(15)
