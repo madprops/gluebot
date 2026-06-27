@@ -9,6 +9,7 @@ import os
 import aiohttp
 import random
 import time
+import html
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -38,8 +39,10 @@ places_data = []
 
 gifmaker_common = [
     "/home/botdude/.local/bin/gifmaker",
-    "--width", 350,
-    "--output", "/tmp/gifmaker",
+    "--width",
+    350,
+    "--output",
+    "/tmp/gifmaker",
     "--nogrow",
 ]
 
@@ -124,15 +127,9 @@ def string_to_number(input_string):
     scaled_number = absolute_hash % 1000
     return scaled_number
 
+
 def clean_string(string):
-    string = string.replace("&#34;", '"')
-    string = string.replace("&#39;", "'")
-    string = string.replace("&quot;", '"')
-    string = string.replace("&apos;", "'")
-    string = string.replace("&amp;", "&")
-    string = string.replace("&lt;", "<")
-    string = string.replace("&gt;", ">")
-    return string
+    return html.unescape(string)
 
 
 def escape_quotes(string):
@@ -186,7 +183,9 @@ def auth():
         exit(1)
 
     data = {"name": username, "password": password, "submit": "log+in"}
-    res = requests.post(url + "/login/submit", headers=headers, data=data, allow_redirects=False)
+    res = requests.post(
+        url + "/login/submit", headers=headers, data=data, allow_redirects=False
+    )
     token = re.search("(?:api_token)=[^;]+", res.headers.get("Set-Cookie")).group(0)
     session = re.search("(?:session_id)=[^;]+", res.headers.get("Set-Cookie")).group(0)
     headers["Cookie"] = token + "; " + session
@@ -293,7 +292,11 @@ async def on_message(ws, message):
 
         elif cmd in ["help"]:
             update_time()
-            await send_message(ws, f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write | video | where | gallo | oracle", room_id)
+            await send_message(
+                ws,
+                f"Commands: describe | wins | numbers | date | bird | shitpost | who | when | write | video | where | gallo | oracle",
+                room_id,
+            )
 
         elif cmd in ["describe"]:
             if len(args) >= 1:
@@ -332,6 +335,7 @@ async def on_message(ws, message):
 
             if len(args) > 0:
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
             else:
                 arg = None
 
@@ -342,6 +346,7 @@ async def on_message(ws, message):
 
             if len(args) > 0:
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
             else:
                 arg = None
 
@@ -404,6 +409,7 @@ async def on_message(ws, message):
 
             if len(args) > 0:
                 arg = " ".join(clean_list(args))
+                arg = clean_gifmaker(arg)
             else:
                 arg = None
 
@@ -411,17 +417,27 @@ async def on_message(ws, message):
 
 
 async def gallo_gif(ws, arg, room_id):
-    command = gifmaker_command([
-        "--input", get_path("gallo.gif"),
-        "--words", arg,
-        "--fontsize", 28,
-        "--delay", 10,
-        "--fontcolor", "black",
-        "--order", "normal",
-        "--top", 15,
-        "--frames", 30,
-        "--fillwords",
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("gallo.gif"),
+            "--words",
+            arg,
+            "--fontsize",
+            28,
+            "--delay",
+            10,
+            "--fontcolor",
+            "black",
+            "--order",
+            "normal",
+            "--top",
+            15,
+            "--frames",
+            30,
+            "--fillwords",
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -442,7 +458,9 @@ async def make_video(ws, arg, room_id):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=last_file_ext) as temp_file:
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=last_file_ext
+                ) as temp_file:
                     while True:
                         chunk = await response.content.read(1024)
                         if not chunk:
@@ -456,24 +474,41 @@ async def make_video(ws, arg, room_id):
                 if words == "random":
                     words = "[Random] [Random]"
 
-                command = gifmaker_command([
-                    "--input", file_name,
-                    "--words", words,
-                    "--filter", "anyhue2",
-                    "--opacity", 0.8,
-                    "--fontsize", 60,
-                    "--delay", 600,
-                    "--padding", 30,
-                    "--fontcolor", "light2",
-                    "--bgcolor", "black",
-                    "--bottom", 30,
-                    "--font", "nova",
-                    "--frames", 18,
-                    "--fillgen",
-                    "--word-color-mode", "random",
-                    "--width", 600,
-                    "--output", "/tmp/gifmaker.webm",
-                ])
+                command = gifmaker_command(
+                    [
+                        "--input",
+                        file_name,
+                        "--words",
+                        words,
+                        "--filter",
+                        "anyhue2",
+                        "--opacity",
+                        0.8,
+                        "--fontsize",
+                        60,
+                        "--delay",
+                        600,
+                        "--padding",
+                        30,
+                        "--fontcolor",
+                        "light2",
+                        "--bgcolor",
+                        "black",
+                        "--bottom",
+                        30,
+                        "--font",
+                        "nova",
+                        "--frames",
+                        18,
+                        "--fillgen",
+                        "--word-color-mode",
+                        "random",
+                        "--width",
+                        600,
+                        "--output",
+                        "/tmp/gifmaker.webm",
+                    ]
+                )
 
                 await run_gifmaker(command, room_id)
                 os.remove(file_name)
@@ -494,7 +529,9 @@ async def make_meme(ws, arg, room_id):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=last_file_ext) as temp_file:
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=last_file_ext
+                ) as temp_file:
                     while True:
                         chunk = await response.content.read(1024)
                         if not chunk:
@@ -508,22 +545,37 @@ async def make_meme(ws, arg, room_id):
                 if words == "random":
                     words = "[Random] [Random]"
 
-                command = gifmaker_command([
-                    "--input", file_name,
-                    "--words", words,
-                    "--filter", "anyhue2",
-                    "--opacity", 0.8,
-                    "--fontsize", 60,
-                    "--delay", 700,
-                    "--padding", 30,
-                    "--fontcolor", "light2",
-                    "--bgcolor", "black",
-                    "--bottom", 30,
-                    "--font", "nova",
-                    "--frames", 3,
-                    "--fillgen",
-                    "--word-color-mode", "random",
-                ])
+                command = gifmaker_command(
+                    [
+                        "--input",
+                        file_name,
+                        "--words",
+                        words,
+                        "--filter",
+                        "anyhue2",
+                        "--opacity",
+                        0.8,
+                        "--fontsize",
+                        60,
+                        "--delay",
+                        700,
+                        "--padding",
+                        30,
+                        "--fontcolor",
+                        "light2",
+                        "--bgcolor",
+                        "black",
+                        "--bottom",
+                        30,
+                        "--font",
+                        "nova",
+                        "--frames",
+                        3,
+                        "--fillgen",
+                        "--word-color-mode",
+                        "random",
+                    ]
+                )
 
                 await run_gifmaker(command, room_id)
                 os.remove(file_name)
@@ -535,21 +587,32 @@ async def make_meme(ws, arg, room_id):
 
 async def random_bird(ws, room_id):
     bird = random.choice(bird_data).strip()
-    await send_message(ws, f".i \"{bird}\" bird", room_id)
+    await send_message(ws, f'.i "{bird}" bird', room_id)
 
 
 async def gif_describe(who, room_id):
-    command = gifmaker_command([
-        "--input", get_path("describe.jpg"),
-        "--words", f"{who} is\\n[Random] [x5]",
-        "--filter", "anyhue2",
-        "--opacity", 0.8,
-        "--fontsize", 66,
-        "--delay", 700,
-        "--padding", 50,
-        "--fontcolor", "light2",
-        "--bgcolor", "black",
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("describe.jpg"),
+            "--words",
+            f"{who} is\\n[Random] [x5]",
+            "--filter",
+            "anyhue2",
+            "--opacity",
+            0.8,
+            "--fontsize",
+            66,
+            "--delay",
+            700,
+            "--padding",
+            50,
+            "--fontcolor",
+            "light2",
+            "--bgcolor",
+            "black",
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -558,15 +621,24 @@ async def gif_wins(who, room_id):
     if not who:
         who = random.choice(userlist)
 
-    command = gifmaker_command([
-        "--input", get_path("wins.gif"),
-        "--words", f"{who} wins a ; [repeat] ; [RANDOM] ; [repeat]",
-        "--bgcolor", "0,0,0",
-        "--bottom", 20,
-        "--filter", "anyhue2",
-        "--framelist", "11,11,33,33",
-        "--fontsize", 42,
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("wins.gif"),
+            "--words",
+            f"{who} wins a ; [repeat] ; [RANDOM] ; [repeat]",
+            "--bgcolor",
+            "0,0,0",
+            "--bottom",
+            20,
+            "--filter",
+            "anyhue2",
+            "--framelist",
+            "11,11,33,33",
+            "--fontsize",
+            42,
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -592,27 +664,43 @@ async def gif_numbers(arg, room_id):
     if num == -1:
         num = random_int(0, 999)
 
-    command = gifmaker_command([
-        "--input", get_path("numbers.png"),
-        "--top", 20,
-        "--words", num,
-        "--fontcolor", "0,0,0",
-        "--fontsize", 66,
-        "--format", "jpg",
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("numbers.png"),
+            "--top",
+            20,
+            "--words",
+            num,
+            "--fontcolor",
+            "0,0,0",
+            "--fontsize",
+            66,
+            "--format",
+            "jpg",
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
 
 async def gif_date(room_id):
-    command = gifmaker_command([
-        "--input", get_path("time.jpg"),
-        "--words", "Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]",
-        "--filter", "anyhue2",
-        "--bottom", 20,
-        "--bgcolor", "0,0,0",
-        "--fontsize", 80,
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("time.jpg"),
+            "--words",
+            "Date: [date %A %d] ; [repeat] ; Time: [date %I:%M %p] ; [repeat]",
+            "--filter",
+            "anyhue2",
+            "--bottom",
+            20,
+            "--bgcolor",
+            "0,0,0",
+            "--fontsize",
+            80,
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -623,19 +711,31 @@ async def gif_user(who, room_id):
 
     what = random.choice(["based", "cringe"])
 
-    command = gifmaker_command([
-        "--input", get_path("nerd.jpg"),
-        "--words", f"{who} is [x2] ; {what} [x2]",
-        "--filter", "anyhue2",
-        "--bottom", 20,
-        "--fontcolor", "light2",
-        "--bgcolor", "darkfont2",
-        "--outline", "font",
-        "--deepfry",
-        "--font", "nova",
-        "--fontsize", 45,
-        "--opacity", 0.8,
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("nerd.jpg"),
+            "--words",
+            f"{who} is [x2] ; {what} [x2]",
+            "--filter",
+            "anyhue2",
+            "--bottom",
+            20,
+            "--fontcolor",
+            "light2",
+            "--bgcolor",
+            "darkfont2",
+            "--outline",
+            "font",
+            "--deepfry",
+            "--font",
+            "nova",
+            "--fontsize",
+            45,
+            "--opacity",
+            0.8,
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -646,19 +746,32 @@ async def gif_when(who, room_id):
 
     date = random_date()
 
-    command = gifmaker_command([
-        "--input", get_path("sky.jpg"),
-        "--words", f"{who} will die [x2] ; {date} [x2]",
-        "--filter", "anyhue2",
-        "--bottom", 66,
-        "--fontcolor", "light2",
-        "--bgcolor", "darkfont2",
-        "--outline", "font",
-        "--font", "nova",
-        "--fontsize", 70,
-        "--opacity", 0.8,
-        "--wrap", 25,
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("sky.jpg"),
+            "--words",
+            f"{who} will die [x2] ; {date} [x2]",
+            "--filter",
+            "anyhue2",
+            "--bottom",
+            66,
+            "--fontcolor",
+            "light2",
+            "--bgcolor",
+            "darkfont2",
+            "--outline",
+            "font",
+            "--font",
+            "nova",
+            "--fontsize",
+            70,
+            "--opacity",
+            0.8,
+            "--wrap",
+            25,
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -669,19 +782,32 @@ async def gif_where(who, room_id):
 
     place = random_country()
 
-    command = gifmaker_command([
-        "--input", get_path("place.jpg"),
-        "--words", f"{who} is going to [x2] ; {place} [x2]",
-        "--filter", "anyhue2",
-        "--bottom", 66,
-        "--fontcolor", "light2",
-        "--bgcolor", "darkfont2",
-        "--outline", "font",
-        "--font", "nova",
-        "--fontsize", 70,
-        "--opacity", 0.8,
-        "--wrap", 25,
-    ])
+    command = gifmaker_command(
+        [
+            "--input",
+            get_path("place.jpg"),
+            "--words",
+            f"{who} is going to [x2] ; {place} [x2]",
+            "--filter",
+            "anyhue2",
+            "--bottom",
+            66,
+            "--fontcolor",
+            "light2",
+            "--bgcolor",
+            "darkfont2",
+            "--outline",
+            "font",
+            "--font",
+            "nova",
+            "--fontsize",
+            70,
+            "--opacity",
+            0.8,
+            "--wrap",
+            25,
+        ]
+    )
 
     await run_gifmaker(command, room_id)
 
@@ -797,7 +923,9 @@ async def upload(path, room_id):
     else:
         ctype = f"image/{ext}"
 
-    data.add_field(name="files[]", value=open(path, "rb"), filename=path.name, content_type=ctype)
+    data.add_field(
+        name="files[]", value=open(path, "rb"), filename=path.name, content_type=ctype
+    )
 
     try:
         async with aiohttp.ClientSession(cookies=cookies) as sess:
@@ -812,6 +940,7 @@ async def upload(path, room_id):
 
 async def send_message(ws, text, room_id):
     await ws.send(json.dumps({"type": "message", "data": text, "roomId": room_id}))
+
 
 birdfile = get_path("data/aves.txt")
 bird_data = open(birdfile, "r").readlines()
