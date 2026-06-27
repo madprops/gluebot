@@ -38,7 +38,7 @@ bird_data = []
 places_data = []
 
 gifmaker_common = [
-    "/home/botdude/.local/bin/gifmaker",
+    "/home/joe/.local/bin/gifmaker",
     "--width",
     350,
     "--output",
@@ -48,7 +48,7 @@ gifmaker_common = [
 
 oracle_common = [
     "node",
-    "/home/botdude/oracle/video.js",
+    "/home/joe/oracle/video.js",
 ]
 
 
